@@ -21,7 +21,11 @@ int main(int argc, char *argv[]) {
     countCharacters(text, &info);
 
     for (int i = 0; i < 26; i++) {
-        printf("%c: %d\n", 'A' + i, info.alphaCount[i]);
+        printf("%c: %7d", 'A' + i, info.alphaCount[i]);
+        for (int j = 0; j < (info.alphaCount[i] / 500); j++){
+            printf("|");
+        }
+        printf("\n");
     }
 
     return 0;
