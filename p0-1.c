@@ -13,6 +13,11 @@ void countCharacters(FILE* text, charInfo* info);
 int findMax(int* arr, int size);
 
 int main(int argc, char *argv[]) {
+    if (argv[1] == NULL){
+        printf("please provide one argument\n");
+        return 1;
+    }
+
     charInfo info;
     memset(info.alphaCount, 0, sizeof(info.alphaCount));
     
@@ -26,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     int maxCharCount = findMax(info.alphaCount, NUM_LETTERS);
     float charPerBar = maxCharCount / (float)MAX_GRAPH_WIDTH;
-    printf("%f\n", charPerBar);
+    if (maxCharCount == 0) charPerBar == MAX_GRAPH_WIDTH;
 
     for (int i = 0; i < NUM_LETTERS; i++) {
         printf("%c: %7d", 'A' + i, info.alphaCount[i]);
