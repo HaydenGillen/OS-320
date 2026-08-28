@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#define NUM_LETTERS 26
+#define MAX_GRAPH_WIDTH 50
+
 typedef struct {
     char c;
-    int alphaCount[26]; 
+    int alphaCount[NUM_LETTERS]; 
 } charInfo;
 
 void countCharacters(FILE* text, charInfo* info);
+int findMax(int* arr, int size);
 
 int main(int argc, char *argv[]) {
     charInfo info;
@@ -20,9 +24,13 @@ int main(int argc, char *argv[]) {
 
     countCharacters(text, &info);
 
-    for (int i = 0; i < 26; i++) {
+    int maxCharCount = findMax(info.alphaCount, NUM_LETTERS);
+    float charPerBar = maxCharCount / (float)MAX_GRAPH_WIDTH;
+    printf("%f\n", charPerBar);
+
+    for (int i = 0; i < NUM_LETTERS; i++) {
         printf("%c: %7d", 'A' + i, info.alphaCount[i]);
-        for (int j = 0; j < (info.alphaCount[i] / 500); j++){
+        for (int j = 0; j < (int)(info.alphaCount[i] / charPerBar); j++){
             printf("|");
         }
         printf("\n");
@@ -39,4 +47,14 @@ void countCharacters(FILE* text, charInfo* info){
             info->alphaCount[info->c - 'A']++;
         }
     }
+}
+
+int findMax(int* arr,int size){
+    int max = 0;
+    for (int i = 0; i < size; i++){
+        if (arr[i] > max){
+            max = arr[i];
+        } 
+    }
+    return max;
 }
