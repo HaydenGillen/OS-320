@@ -5,8 +5,8 @@
 #define MAX_GRAPH_WIDTH 50
 
 typedef struct {
-    char c;
     int alphaCount[NUM_LETTERS]; 
+    char c;
 } charInfo;
 
 void countCharacters(FILE* text, charInfo* info);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     int maxCharCount = findMax(info.alphaCount, NUM_LETTERS);
     float charPerBar = maxCharCount / (float)MAX_GRAPH_WIDTH;
-    if (maxCharCount == 0) charPerBar == MAX_GRAPH_WIDTH;
+    if (maxCharCount == 0) charPerBar = MAX_GRAPH_WIDTH;
 
     for (int i = 0; i < NUM_LETTERS; i++) {
         printf("%c: %7d", 'A' + i, info.alphaCount[i]);
