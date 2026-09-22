@@ -1,0 +1,21 @@
+#!/bin/bash
+# Usage: ./build.sh source.c
+# Compiles source.c -> OUT/source (no .c extension), then runs it.
+ 
+set -e
+ 
+if [ -z "$1" ]; then
+    echo "Usage: $0 <file.c>"
+    exit 1
+fi
+ 
+src="$1"
+name=$(basename "$src" .c)
+ 
+mkdir -p OUT
+ 
+gcc "$src" -o "OUT/$name"
+ 
+./"OUT/$name"
+
+
