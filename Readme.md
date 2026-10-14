@@ -4,9 +4,9 @@
 We see that after running for a while, the pass categories all even out and remain relatively similar. all of these processes started at the same time, we see that the PID with stride 1 is scheduled about 10 times as often as as the PID with 10 stride. We see that (PID A Stride / PID B Stride) ≈ (PID B Runtime / PID A Runtime) holds true for all combinations of A and B from our data. This is what we would expect because if we add 10 to pass for PID B with 10 stride, we need to run PID A 10 times at one stride per pass to get to 10 where PID B can run again.
 
 <img width="332" height="49" alt="image" src="https://github.com/user-attachments/assets/6b0cecc4-b41e-4bad-868f-32dff288c56e" />
-
+<br>
 <img width="334" height="48" alt="image" src="https://github.com/user-attachments/assets/38de7544-4e9a-4dcc-91d0-f6b778f02457" />
-
+<br>
 <img width="352" height="50" alt="image" src="https://github.com/user-attachments/assets/e6b364ac-d0bf-4c0a-903f-c230bdb41638" />
 
 We also see when a new process enters the system it dominates the cpu because it has not accumulated much pass and will be the lowest pass until it catches up with process already in the system. we see PID 9 above enter the system and the following 3 processes do not run again until PID 9 accumulates the same amount of pass and then cpu time is distributed among proceeses according to their stride.
