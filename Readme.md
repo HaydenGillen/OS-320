@@ -11,22 +11,22 @@ We see that after running for a while, the pass categories all even out and rema
 
 We also see when a new process enters the system it dominates the cpu because it has not accumulated much pass and will be the lowest pass until it catches up with process already in the system. we see PID 9 above enter the system and the following 3 processes do not run again until PID 9 accumulates the same amount of pass and then cpu time is distributed among proceeses according to their stride.
 
-Files Modified
-    To add new syscalls for getpinfo and setstride
-        modified:   kernel/syscall.c
-        modified:   kernel/syscall.h
-        modified:   kernel/sysproc.c
-        modified:   user/user.h
-        modified:   user/usys.pl
-    Test Files for the user to determine if stride scheduling works
-        new file:   user/getpinfo.c - I made mine spin and every so often print
-        new file:   kernel/pstat.h
-        new file:   user/hardwork.c
-    Stride Scheduler
-        modified:   Makefile
-        modified:   kernel/defs.h
-        modified:   kernel/proc.c
-        modified:   kernel/proc.h
+<br>Files Modified
+<br>    To add new syscalls for getpinfo and setstride
+<br>        modified:   kernel/syscall.c
+<br>        modified:   kernel/syscall.h
+<br>        modified:   kernel/sysproc.c
+<br>        modified:   user/user.h
+<br>        modified:   user/usys.pl
+<br>    Test Files for the user to determine if stride scheduling works
+<br>        new file:   user/getpinfo.c - I made mine spin and every so often print
+<br>        new file:   kernel/pstat.h
+<br>        new file:   user/hardwork.c
+<br>    Stride Scheduler
+<br>        modified:   Makefile
+<br>        modified:   kernel/defs.h
+<br>        modified:   kernel/proc.c
+<br>        modified:   kernel/proc.h
 
 What I did
 I added runtime to the process struct so that it could be tracked every time the process is put on the cpu. then I made the getpinfo syscall with the pstat struct. I also added   int pass[NPROC]; // the number of strides each process has accumulated, int stride[NPROC]; // stride length of each process, and int syspasses; // total system passes so that it would be more clear what was happening with the passes and strides of each process when calling getpinfo. I also added stride and pass to the process struct. In allocproc, stride defaults to 1, pass is set to 0, and runtime is set to 0. Then I implemented the stride scheduler portion. It loops through each process and grabs the processes lock. if the process has the lowest pass it releases the lock of the last lowest pass we identified and continues. if the process does not have the lowest pass the lock is released. this way we always have the lock of the lowest pass from the moment we look at it. then it switches processes and releases the lock. Also before looping through the processes, it checks if our pass total is greater than the max which I defined in defs.h. If it is greater then we set all process pass values to 0 and the total pass to 0. I also set CPU to one and changed the Makefile so that my c files would be compiled in.
