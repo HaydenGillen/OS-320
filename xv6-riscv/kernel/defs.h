@@ -1,3 +1,7 @@
+#include "pstat.h"
+
+#define MAX_PASS_TOTAL 100000
+
 // clang-format off
 struct buf;
 struct context;
@@ -104,6 +108,8 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 int             countOpenFiles(int pid);
+int             getpinfo(struct pstat *pFromUser);
+int             setstride(int strideLength);
 
 // swtch.S
 void            swtch(struct context*, struct context*);

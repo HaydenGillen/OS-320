@@ -119,3 +119,18 @@ sys_getfilenum(void)
   argint(0, &pid);
   return countOpenFiles(pid);
 }
+
+uint64
+sys_getpinfo(void){
+  uint64 p; 
+  argaddr(0, &p); 
+  return getpinfo((struct pstat *)p);
+}
+
+uint64
+sys_setstride(void){
+  int strideLength;
+
+  argint(0, &strideLength);
+  return setstride(strideLength);
+}

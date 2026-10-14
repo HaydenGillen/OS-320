@@ -26,6 +26,8 @@ int pause(int);
 int uptime(void);
 int sync(void);
 int getfilenum(int);
+int getpinfo(void* pFromUser);
+int setstride(int strideLength);
 
 // ulib.c
 int stat(const char *, struct stat *);

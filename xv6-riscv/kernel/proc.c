@@ -14,6 +14,7 @@ struct proc *initproc;
 
 int nextpid = 1;
 struct spinlock pid_lock;
+int passtotal = 0;              // total passes or strides
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
@@ -145,6 +146,11 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
+
+  // Set runtime, passes, stride to 0
+  p->runtime = 0;
+  p->pass = 0;
+  p->stride = 1;
 
   return p;
 }
@@ -441,28 +447,48 @@ scheduler(void)
     intr_on();
     intr_off();
 
-    int found = 0;
+    struct proc *lowestpass = 0;
+    // find the lowest stride process
     for (p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if (p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-
-        // Don't re-enable interrupts on release.
-        mycpu()->intena = 0;
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
+      // reset passes as we go if we're above the max pass total
+      if (passtotal > MAX_PASS_TOTAL) p->pass = 0;
+      // if it can be run and it's got the lowest stride so far
+      if (p->state == RUNNABLE && (lowestpass == 0 || p->pass < lowestpass->pass)){
+        if(lowestpass) release(&lowestpass->lock);
+        lowestpass = p;
       }
+      else {
+        release(&p->lock);
+      }
+    }
+    // reset pass total
+    if (passtotal > MAX_PASS_TOTAL) passtotal = 0;
+
+    // so I don't have to rewrite the following
+    p = lowestpass;
+    if (lowestpass) {
+      // Switch to chosen process.  It is the process's job
+      // to release its lock and then reacquire it
+      // before jumping back to us.
+      p->state = RUNNING;
+      // increment runtime by one tick, pass by stride, and total passes by stride
+      (p->runtime)++;
+      p->pass += p->stride;
+      passtotal += p->stride;
+
+      c->proc = p;
+      swtch(&c->context, &p->context);
+
+      // Don't re-enable interrupts on release.
+      mycpu()->intena = 0;
+
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
       release(&p->lock);
     }
-    if (found == 0) {
+    else {
       // nothing to run; stop running on this core until an interrupt.
       asm volatile("wfi");
     }
@@ -716,5 +742,30 @@ int countOpenFiles(int pid){
     }
   }
 
+  return -1;
+}
+
+// get information about runtime of all processes
+// invalid return -1
+int getpinfo(struct pstat *pFromUser)
+{
+  struct pstat pinfo; // local to kernel
+  for (int i=0; i < NPROC; ++i) {
+      pinfo.inuse[i] = (proc[i].state != UNUSED);
+      pinfo.pid[i] = (proc[i].pid);
+      pinfo.runtime[i] = (proc[i].runtime);
+      pinfo.pass[i] = (proc[i].pass);
+      pinfo.stride[i] = (proc[i].stride);
+      pinfo.syspasses = passtotal;
+    }
+  // now copy to user space from the pinfo structure
+  return !either_copyout(1, (uint64) pFromUser, &pinfo, sizeof(struct pstat));
+ }
+
+int setstride(int strideLength){
+  if(strideLength){
+    myproc()->stride = strideLength;
+    return 0;
+  }
   return -1;
 }
