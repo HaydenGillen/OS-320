@@ -134,3 +134,16 @@ sys_setstride(void){
   argint(0, &strideLength);
   return setstride(strideLength);
 }
+
+int
+sys_pgaccess(void){
+  uint64 vaddr;
+  int numPages;
+  uint64 returnBuffer;
+
+  argaddr(0, &vaddr);
+  argint(1, &numPages);
+  argaddr(2, &returnBuffer);
+
+  return pgaccess((uint64)vaddr, numPages, (uint64)returnBuffer);
+}

@@ -46,3 +46,4 @@ entry("sync");
 entry("getfilenum");
 entry("getpinfo");
 entry("setstride");
+entry("pgaccess");

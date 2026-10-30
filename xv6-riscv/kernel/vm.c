@@ -489,3 +489,45 @@ ismapped(pagetable_t pagetable, uint64 va)
   }
   return 0;
 }
+
+void vmprint(pagetable_t pagetable, int level)
+{
+  if (level == 1) printk("page table %p\n", pagetable);
+
+  // 512 entries in a page table
+  for (int i = 0; i < 512; i++) {
+    pte_t pte = pagetable[i];
+    // if it's valid keep going
+    if (!(pte & PTE_V)) continue;
+
+    // print formatting
+    for (int j = 0; j < level; j++) printk(" ..");
+    printk("%d: pte %p pa %p\n", i, (void *)pte, (void*)PTE2PA(pte));
+
+    // this PTE points to a lower-level page table.
+    // so we run it again
+    if ((pte & (PTE_R | PTE_W | PTE_X)) == 0)
+      vmprint((pagetable_t)PTE2PA(pte), level + 1);
+  }
+}
+
+int pgaccess(uint64 vaddr, int numPages, uint64 returnBuffer){
+  uint64 returnBits = 0;
+  
+  // take address of walk addr return and us it as the pagetable, find the difference for index
+  // go numPages indices
+
+
+  for (int i = 0; i < (numPages <= sizeof(returnBits) * 8? numPages : sizeof(returnBits) * 8); ++i){
+    // get pagetable entry
+    pte_t* pte = walk(myproc()->pagetable, (uint64)(vaddr + (i * PGSIZE)), 0);
+        
+    // if page table has been accessed 
+    if(*pte & PTE_A) returnBits |= (1 << i);
+
+    // set access bit to 0
+    *pte = *pte & ~PTE_A;
+  }
+
+  return !either_copyout(1, (uint64) returnBuffer, &returnBits, sizeof(uint64));
+}

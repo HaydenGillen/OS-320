@@ -58,6 +58,16 @@
 //   fixed-size stack
 //   expandable heap
 //   ...
+//   USYSCALL
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
+
+// USYSCALL for user memory system calls
+#define USYSCALL (TRAPFRAME - PGSIZE)
+
+struct usyscall
+{
+      int pid;
+};
+

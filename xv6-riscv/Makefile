@@ -153,6 +153,8 @@ UPROGS=\
 	$U/_getfilenum\
 	$U/_getpinfo\
 	$U/_hardwork\
+	$U/_pgaccess\
+	$U/_getpidROM\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

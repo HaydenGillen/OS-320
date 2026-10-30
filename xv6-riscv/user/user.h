@@ -28,6 +28,8 @@ int sync(void);
 int getfilenum(int);
 int getpinfo(void* pFromUser);
 int setstride(int strideLength);
+int pgaccess(void* vaddr, int numPages, void* returnBuffer);
+int usyscallgetpid();
 
 // ulib.c
 int stat(const char *, struct stat *);
