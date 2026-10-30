@@ -1,3 +1,13 @@
+# Page Tables
+## pt 1
+I used the freewalk function to model my function after. it measures the level of recursive depth and does different prints based on it's recursive depth. it implements the same logic of if page is valid, lets print, and if it points to a lower level page we call it again on that lower level page with an incremented depth/level counter. to test I ran xv6 and looked at the result.
+
+## pt 2
+I made the syscall pgaccess and it creates an empty bit field variable thing and loops through the number of pages requested or the max size of our bitfield if the user requested too many pages. then we use walk to get the PTE and use the bit mask to see if the page has been accessed. then we use the bit mask to unset the bit as well. then each loop we increment our address by the PGSIZE and repeat. to test I used the provided test code and messed with which pages are accessed in the test code and saw if my pgaccess provided what I expected. I did all pages, every other page, and just the first page, results were as expected.
+
+## pt 3
+I placed the USYSCALL just above the trap frame in memlayout, I copied the memory map functions of the trapframe for the usyscall (this is in alloc proc and free proc pagetable ). when the process is allocated we also allocate the usyscall struct and put the pid in there as well as set that page to be read only and user accessible using the PTE_R and PTE_U bit masks. then I wrote a function declared in user.h and defined in ulib.c that reads the memory and returns the pid. I think i called it usyscallgetpid. to test I wrote some test code that prints usyscallgetpid() and getpid(), I ran it a few times and the pids were always the same
+
 # Stride Scheduling
 <img width="332" height="91" alt="image" src="https://github.com/user-attachments/assets/66211577-1a9f-4b46-8e06-9b9572935bfa" />
 
